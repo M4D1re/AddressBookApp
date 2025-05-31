@@ -12,13 +12,18 @@ namespace AddressBookApp
         private bool isAdmin;
         private ObservableCollection<Contact> allContacts = new ObservableCollection<Contact>();
 
+        // Флаги для сортировки
+        private bool sortByFirstNameAsc = true;
+        private bool sortByLastNameAsc = true;
+        private enum SortType { None, FirstName, LastName }
+        private SortType currentSort = SortType.FirstName;
+
         public MainWindow(bool isAdmin)
         {
             InitializeComponent();
             this.isAdmin = isAdmin;
 
             AddButton.IsEnabled = EditButton.IsEnabled = DeleteButton.IsEnabled = isAdmin;
-            ManagePasswordButton.Visibility = isAdmin ? Visibility.Visible : Visibility.Collapsed;
 
             ContactsList.ItemsSource = allContacts;
 
@@ -31,7 +36,132 @@ namespace AddressBookApp
             var contactsFromDb = DatabaseHelper.GetContacts();
             foreach (var contact in contactsFromDb)
                 allContacts.Add(contact);
+
+            ApplyFilterAndSort();
         }
+
+        //private void ApplyFilterAndSort()
+        //{
+        //    // Проверка на null для всех объектов
+        //    if (SearchBox == null || allContacts == null)
+        //        return;
+
+        //    string text = SearchBox.Text?.Trim() ?? string.Empty;
+
+        //    // Если текст пуст или это текст по умолчанию, фильтрацию не выполняем
+        //    if (string.IsNullOrEmpty(text) || text == "Поиск...")
+        //    {
+        //        // Применяем сортировку
+        //        ApplySort();
+        //        return;
+        //    }
+
+        //    // Фильтрация контактов
+        //    var filtered = allContacts.Where(c =>
+        //        (!string.IsNullOrEmpty(c.FirstName) && c.FirstName.ToLower().Contains(text.ToLower())) ||
+        //        (!string.IsNullOrEmpty(c.LastName) && c.LastName.ToLower().Contains(text.ToLower())) ||
+        //        (!string.IsNullOrEmpty(c.PhoneNumber) && c.PhoneNumber.ToLower().Contains(text.ToLower()))
+        //    ).ToList();
+
+        //    // Применяем сортировку
+        //    ApplySort(filtered);
+        //}
+
+        //// Метод для сортировки
+        //private void ApplySort(List<Contact> filtered = null)
+        //{
+        //    // Если фильтрация не применялась, работаем с исходным списком
+        //    var contactsToSort = filtered ?? allContacts.ToList();
+
+        //    switch (currentSort)
+        //    {
+        //        case SortType.FirstName:
+        //            contactsToSort = sortByFirstNameAsc
+        //                ? contactsToSort.OrderBy(c => c.FirstName).ToList()
+        //                : contactsToSort.OrderByDescending(c => c.FirstName).ToList();
+        //            break;
+        //        case SortType.LastName:
+        //            contactsToSort = sortByLastNameAsc
+        //                ? contactsToSort.OrderBy(c => c.LastName).ToList()
+        //                : contactsToSort.OrderByDescending(c => c.LastName).ToList();
+        //            break;
+        //    }
+
+        //    // Обновляем ItemsSource
+        //    ContactsList.ItemsSource = contactsToSort;
+        //}
+
+        private void ApplyFilterAndSort()
+        {
+            // Проверка на null для всех объектов
+            if (SearchBox == null || allContacts == null)
+            {
+                MessageBox.Show("Поиск не может быть выполнен: объект SearchBox или все контакты не инициализированы.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            string text = SearchBox.Text?.Trim() ?? string.Empty;
+
+            // Если текст пуст или это текст по умолчанию, фильтрацию не выполняем
+            if (string.IsNullOrEmpty(text) || text == "Поиск...")
+            {
+                // Применяем сортировку
+                ApplySort();
+                return;
+            }
+
+            // Фильтрация контактов
+            var filtered = allContacts.Where(c =>
+                (!string.IsNullOrEmpty(c.FirstName) && c.FirstName.ToLower().Contains(text.ToLower())) ||
+                (!string.IsNullOrEmpty(c.LastName) && c.LastName.ToLower().Contains(text.ToLower())) ||
+                (!string.IsNullOrEmpty(c.PhoneNumber) && c.PhoneNumber.ToLower().Contains(text.ToLower()))
+            ).ToList();
+
+            // Если после фильтрации список пуст
+            if (filtered.Count == 0)
+            {
+                MessageBox.Show("Не найдено ни одного контакта, соответствующего запросу.", "Результаты поиска", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+
+            // Применяем сортировку
+            ApplySort(filtered);
+        }
+
+        // Метод для сортировки
+        private void ApplySort(List<Contact> filtered = null)
+        {
+            // Если фильтрация не применялась, работаем с исходным списком
+            var contactsToSort = filtered ?? allContacts.ToList();
+
+            // Если contactsToSort пустой, выведем сообщение
+            if (contactsToSort.Count == 0)
+            {
+                MessageBox.Show("Список контактов пуст. Необходимо добавить контакты.", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            // Включение отладочных сообщений для сортировки
+           // MessageBox.Show($"Применяется сортировка по: {currentSort}", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            switch (currentSort)
+            {
+                case SortType.FirstName:
+                    contactsToSort = sortByFirstNameAsc
+                        ? contactsToSort.OrderBy(c => c.FirstName).ToList()
+                        : contactsToSort.OrderByDescending(c => c.FirstName).ToList();
+                    break;
+                case SortType.LastName:
+                    contactsToSort = sortByLastNameAsc
+                        ? contactsToSort.OrderBy(c => c.LastName).ToList()
+                        : contactsToSort.OrderByDescending(c => c.LastName).ToList();
+                    break;
+            }
+
+            // Обновляем ItemsSource
+            ContactsList.ItemsSource = contactsToSort;
+        }
+
+
 
         private void AddButton_Click(object sender, RoutedEventArgs e)
         {
@@ -66,37 +196,41 @@ namespace AddressBookApp
             }
         }
 
-        private void ManagePasswordButton_Click(object sender, RoutedEventArgs e)
+        private void SortByFirstNameButton_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new SetAdminPasswordWindow();
-            dialog.ShowDialog();
+            if (currentSort == SortType.FirstName)
+                sortByFirstNameAsc = !sortByFirstNameAsc;
+            else
+            {
+                currentSort = SortType.FirstName;
+                sortByFirstNameAsc = true;
+            }
+
+            SortByFirstNameButton.Content = $"Сортировать по имени {(sortByFirstNameAsc ? "↑" : "↓")}";
+            SortByLastNameButton.Content = "Сортировать по фамилии";
+
+            ApplyFilterAndSort();
+        }
+
+        private void SortByLastNameButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (currentSort == SortType.LastName)
+                sortByLastNameAsc = !sortByLastNameAsc;
+            else
+            {
+                currentSort = SortType.LastName;
+                sortByLastNameAsc = true;
+            }
+
+            SortByLastNameButton.Content = $"Сортировать по фамилии {(sortByLastNameAsc ? "↑" : "↓")}";
+            SortByFirstNameButton.Content = "Сортировать по имени";
+
+            ApplyFilterAndSort();
         }
 
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            //if (SearchBox == null || allContacts == null)
-            //    return;
-
-            //string text = SearchBox.Text;
-
-            //if (string.IsNullOrEmpty(text) || text.ToLower() == "поиск...")
-            //{
-            //    ContactsList.ItemsSource = allContacts;
-            //    return;
-            //}
-
-            //string searchText = text.ToLower();
-
-            //var filtered = allContacts.Where(c =>
-            //{
-            //    bool firstNameMatch = !string.IsNullOrEmpty(c.FirstName) && c.FirstName.ToLower().Contains(searchText);
-            //    bool lastNameMatch = !string.IsNullOrEmpty(c.LastName) && c.LastName.ToLower().Contains(searchText);
-            //    bool phoneMatch = !string.IsNullOrEmpty(c.PhoneNumber) && c.PhoneNumber.ToLower().Contains(searchText);
-            //    bool categoryMatch = !string.IsNullOrEmpty(c.Category) && c.Category.ToLower().Contains(searchText);
-            //    return firstNameMatch || lastNameMatch || phoneMatch || categoryMatch;
-            //}).ToList();
-
-            //ContactsList.ItemsSource = filtered;
+            ApplyFilterAndSort();
         }
 
         private void SearchBox_GotFocus(object sender, RoutedEventArgs e)

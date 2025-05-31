@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AddressBookApp"
         mc:Ignorable="d"
-        Title="Адресная книга" Height="450" Width="800">
+          Title="Адресная книга" Height="450" Width="800">
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -28,8 +28,8 @@
             <Button x:Name="AddButton" Content="Добавить" Margin="5" Click="AddButton_Click"/>
             <Button x:Name="EditButton" Content="Редактировать" Margin="5" Click="EditButton_Click"/>
             <Button x:Name="DeleteButton" Content="Удалить" Margin="5" Click="DeleteButton_Click"/>
-            <Button x:Name="ManagePasswordButton" Content="Настроить пароль администратора"
-                    Margin="5" Click="ManagePasswordButton_Click" Visibility="Collapsed"/>
+            <Button x:Name="SortByFirstNameButton" Content="Сортировать по имени ↑" Margin="5" Click="SortByFirstNameButton_Click"/>
+            <Button x:Name="SortByLastNameButton" Content="Сортировать по фамилии" Margin="5" Click="SortByLastNameButton_Click"/>
         </StackPanel>
     </Grid>
 </Window>
