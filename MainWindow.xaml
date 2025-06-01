@@ -5,31 +5,154 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AddressBookApp"
         mc:Ignorable="d"
-          Title="Адресная книга" Height="450" Width="800">
+        Title="Адресная книга" Height="500" Width="850"
+        WindowStartupLocation="CenterScreen"
+        Background="#FFF5FAFF">
+    <Window.Resources>
+        <!-- Стиль для круглых голубых кнопок -->
+        <Style x:Key="RoundBlueButton" TargetType="Button">
+            <Setter Property="Background" Value="#FF4DA6FF"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="17"
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                BorderBrush="{TemplateBinding BorderBrush}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF3399FF"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#FF0077CC"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Стиль для текстового поля -->
+        <Style x:Key="ModernTextBox" TargetType="TextBox">
+            <Setter Property="Foreground" Value="#FF333333"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="Foreground" Value="Black"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Стиль для пустого списка -->
+        <Style x:Key="EmptyListStyle" TargetType="ListView">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#FF80C0FF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Items.Count, RelativeSource={RelativeSource Self}}" Value="0">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate>
+                                <Border Background="White" BorderBrush="#FF80C0FF" BorderThickness="1" CornerRadius="5">
+                                    <TextBlock Text="Список контактов пуст" 
+                                               HorizontalAlignment="Center" 
+                                               VerticalAlignment="Center"
+                                               FontSize="16"
+                                               Foreground="Gray"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
     <Grid Margin="10">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Поле поиска -->
-        <TextBox x:Name="SearchBox" Width="200" Margin="0,0,0,10"
-                 Text="Поиск..." Foreground="Gray"
-                 GotFocus="SearchBox_GotFocus" LostFocus="SearchBox_LostFocus"
-                 TextChanged="SearchBox_TextChanged" />
+        <!-- Панель поиска и сортировки -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+            <!-- Поле поиска -->
+            <Border CornerRadius="15" Background="White" BorderThickness="1" BorderBrush="#FF80C0FF" 
+                    VerticalAlignment="Center" Margin="0,0,10,0">
+                <TextBox x:Name="SearchBox" Width="250" Padding="10,5" Margin="5"
+                         Text="Поиск..." Foreground="#FF808080" BorderThickness="0"
+                         Style="{StaticResource ModernTextBox}"
+                         GotFocus="SearchBox_GotFocus" LostFocus="SearchBox_LostFocus"
+                         TextChanged="SearchBox_TextChanged"/>
+            </Border>
+
+            <!-- Кнопки сортировки -->
+            <Border CornerRadius="15" Background="#FFE6F2FF" Padding="5" Margin="0,0,10,0">
+                <StackPanel Orientation="Horizontal">
+                    <Button x:Name="SortByFirstNameButton" Content="Имя ↑" Margin="3" 
+                            Style="{StaticResource RoundBlueButton}" Click="SortByFirstNameButton_Click"/>
+                    <Button x:Name="SortByLastNameButton" Content="Фамилия" Margin="3" 
+                            Style="{StaticResource RoundBlueButton}" Click="SortByLastNameButton_Click"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
 
         <!-- Список контактов -->
-        <ListView x:Name="ContactsList" Grid.Row="1" Margin="0,0,0,10"
-                  DisplayMemberPath="Display" />
+        <Border Grid.Row="2" CornerRadius="5" Padding="1">
+            <ListView x:Name="ContactsList" Background="Transparent" BorderThickness="0"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                      Style="{StaticResource EmptyListStyle}">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Имя" Width="120" DisplayMemberBinding="{Binding FirstName}"/>
+                        <GridViewColumn Header="Фамилия" Width="120" DisplayMemberBinding="{Binding LastName}"/>
+                        <GridViewColumn Header="Телефон" Width="120" DisplayMemberBinding="{Binding PhoneNumber}"/>
+                        <GridViewColumn Header="Email" Width="180" DisplayMemberBinding="{Binding Email}"/>
+                        <GridViewColumn Header="Адрес" Width="200" DisplayMemberBinding="{Binding Address}"/>
+                    </GridView>
+                </ListView.View>
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="Padding" Value="8,5"/>
+                        <Setter Property="Margin" Value="0,2"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        <Setter Property="FontSize" Value="14"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FFE6F2FF"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="#FFB3D9FF"/>
+                                <Setter Property="Foreground" Value="Black"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListView.ItemContainerStyle>
+            </ListView>
+        </Border>
 
-        <!-- Кнопки -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Left">
-            <Button x:Name="AddButton" Content="Добавить" Margin="5" Click="AddButton_Click"/>
-            <Button x:Name="EditButton" Content="Редактировать" Margin="5" Click="EditButton_Click"/>
-            <Button x:Name="DeleteButton" Content="Удалить" Margin="5" Click="DeleteButton_Click"/>
-            <Button x:Name="SortByFirstNameButton" Content="Сортировать по имени ↑" Margin="5" Click="SortByFirstNameButton_Click"/>
-            <Button x:Name="SortByLastNameButton" Content="Сортировать по фамилии" Margin="5" Click="SortByLastNameButton_Click"/>
+        <!-- Основные кнопки управления -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,10,0,0">
+            <Button x:Name="AddButton" Content="Добавить" Margin="5" Width="110" Height="35" 
+                    Style="{StaticResource RoundBlueButton}" Click="AddButton_Click"/>
+            <Button x:Name="EditButton" Content="Редактировать" Margin="5" Width="130" Height="35"
+                    Style="{StaticResource RoundBlueButton}" Click="EditButton_Click"/>
+            <Button x:Name="DeleteButton" Content="Удалить" Margin="5" Width="110" Height="35"
+                    Style="{StaticResource RoundBlueButton}" Click="DeleteButton_Click"/>
+            <Button x:Name="AdminSettingsButton" Content="Настройки админа" Margin="5" Width="130" Height="35"
+                    Style="{StaticResource RoundBlueButton}" Click="AdminSettingsButton_Click"/>
         </StackPanel>
     </Grid>
 </Window>

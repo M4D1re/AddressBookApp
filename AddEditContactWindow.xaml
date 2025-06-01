@@ -5,21 +5,84 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AddressBookApp"
         mc:Ignorable="d"
-         Title="Контакт" Height="300" Width="300"
-        WindowStartupLocation="CenterScreen">
+        Title="Контакт" Height="350" Width="300"
+        WindowStartupLocation="CenterScreen"
+        Background="#FFF5FAFF">
+    <Window.Resources>
+        <!-- Стиль для круглых голубых кнопок -->
+        <Style x:Key="RoundBlueButton" TargetType="Button">
+            <Setter Property="Background" Value="#FF4DA6FF"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="17"
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                BorderBrush="{TemplateBinding BorderBrush}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#FF3399FF"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#FF0077CC"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Стиль для текстового поля -->
+        <Style x:Key="ModernTextBox" TargetType="TextBox">
+            <Setter Property="Foreground" Value="#FF333333"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="5"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Style.Triggers>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="Foreground" Value="Black"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
     <StackPanel Margin="20">
-        <TextBlock Text="Имя:"/>
-        <TextBox x:Name="FirstNameBox" Margin="0,0,0,5"/>
+        <!-- Имя -->
+        <TextBlock Text="Имя:" FontSize="14" Height="20"/>
+        <Border CornerRadius="5" Background="White" BorderBrush="#FF80C0FF" BorderThickness="1" Margin="0,0,0,5">
+            <TextBox x:Name="FirstNameBox" Style="{StaticResource ModernTextBox}"/>
+        </Border>
 
-        <TextBlock Text="Фамилия:"/>
-        <TextBox x:Name="LastNameBox" Margin="0,0,0,5"/>
+        <!-- Фамилия -->
+        <TextBlock Text="Фамилия:" FontSize="14"/>
+        <Border CornerRadius="5" Background="White" BorderBrush="#FF80C0FF" BorderThickness="1" Margin="0,0,0,5">
+            <TextBox x:Name="LastNameBox" Style="{StaticResource ModernTextBox}"/>
+        </Border>
 
-        <TextBlock Text="Телефон:"/>
-        <TextBox x:Name="PhoneBox" Margin="0,0,0,5"/>
+        <!-- Телефон -->
+        <TextBlock Text="Телефон:" FontSize="14"/>
+        <Border CornerRadius="5" Background="White" BorderBrush="#FF80C0FF" BorderThickness="1" Margin="0,0,0,5">
+            <TextBox x:Name="PhoneBox" Style="{StaticResource ModernTextBox}"/>
+        </Border>
 
-        <TextBlock Text="Категория:"/>
-        <TextBox x:Name="CategoryBox" Margin="0,0,0,5"/>
+        <!-- Категория -->
+        <TextBlock Text="Категория:" FontSize="14"/>
+        <Border CornerRadius="5" Background="White" BorderBrush="#FF80C0FF" BorderThickness="1" Margin="0,0,0,5">
+            <TextBox x:Name="CategoryBox" Style="{StaticResource ModernTextBox}"/>
+        </Border>
+        <Button Content="Сохранить" 
+                Click="Save_Click"
+                Style="{StaticResource RoundBlueButton}"
+                Width="100" Height="34"/>
 
-        <Button Content="Сохранить" Click="Save_Click"/>
+        <!-- Кнопка сохранения -->
     </StackPanel>
 </Window>
